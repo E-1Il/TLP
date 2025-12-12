@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>塔羅牌抽牌與解讀</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            opacity: 0.9;
+        }
+
+        .form-section {
+            padding: 30px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        button {
+            flex: 1;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-draw {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-draw:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-reset {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .btn-reset:hover {
+            background: #e0e0e0;
+        }
+
+        .result-section {
+            padding: 30px;
+            display: none;
+        }
+
+        .result-section.active {
+            display: block;
+        }
+
+        .result-meta {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+
+        .result-meta h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .result-meta p {
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .cards-container {
+            display: grid;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .card-item {
+            background: #fff;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .card-item:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.1);
+        }
+
+        .card-position {
+            font-size: 12px;
+            color: #999;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .card-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .card-orientation {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #667eea;
+            color: white;
+            border-radius: 12px;
+            font-size: 12px;
+            margin-bottom: 12px;
+        }
+
+        .card-orientation.reversed {
+            background: #764ba2;
+        }
+
+        .card-description {
+            color: #555;
+            line-height: 1.8;
+        }
+
+        .summary-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .summary-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .summary-section p {
+            color: #555;
+            line-height: 1.8;
+        }
+
+        .question-hint {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #ffc107;
+            margin-bottom: 15px;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>✨ 塔羅牌抽牌與解讀 ✨</h1>
+            <p>靜下心來，思考你的問題，讓塔羅為你指引方向</p>
+        </header>
+
+        <div class="form-section">
+            <div class="form-group">
+                <label for="question">你的問題（可選）</label>
+                <textarea id="question" placeholder="例如：接下來一個月我在工作上需要注意什麼？"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="topic">主題</label>
+                <select id="topic">
+                    <option value="love">感情</option>
+                    <option value="career">工作</option>
+                    <option value="money">財務</option>
+                    <option value="self">自我</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="spread">牌陣</label>
+                <select id="spread">
+                    <option value="one">單張：今日提醒</option>
+                    <option value="three">三張：情境/障礙/建議</option>
+                </select>
+            </div>
+
+            <div class="button-group">
+                <button class="btn-draw" id="drawBtn">抽牌</button>
+                <button class="btn-reset" id="resetBtn">重置</button>
+            </div>
+        </div>
+
+        <div class="result-section" id="resultSection">
+            <div class="result-meta" id="resultMeta"></div>
+            <div class="cards-container" id="cardsContainer"></div>
+            <div class="summary-section" id="summarySection"></div>
+        </div>
+    </div>
+
+    <script>
+        // ========================================
+        // DATA SECTION
+        // ========================================
+
+        const CARDS = [
+            {
+                id: 'major-0',
+                nameZh: '愚者',
+                nameEn: 'The Fool',
+                uprightKeywords: ['新開始', '冒險', '純真', '自由', '可能性'],
+                reversedKeywords: ['魯莽', '不負責任', '冒失', '錯誤決定', '迷失方向'],
+                shortMeaningUpright: '代表新的開始和無限的可能性，鼓勵你勇敢踏出第一步',
+                shortMeaningReversed: '可能顯示過於冒失或缺乏計畫，需要更謹慎地評估風險'
+            },
+            {
+                id: 'major-1',
+                nameZh: '魔術師',
+                nameEn: 'The Magician',
+                uprightKeywords: ['技能', '資源', '行動力', '創造', '顯化'],
+                reversedKeywords: ['操控', '欺騙', '浪費才能', '缺乏目標', '能力不足'],
+                shortMeaningUpright: '你擁有實現目標的所有資源和能力，現在是採取行動的時候',
+                shortMeaningReversed: '可能有未充分利用的才能，或需要警惕他人的操控'
+            },
+            {
+                id: 'major-2',
+                nameZh: '女祭司',
+                nameEn: 'The High Priestess',
+                uprightKeywords: ['直覺', '潛意識', '神秘', '內在智慧', '靜待'],
+                reversedKeywords: ['忽視直覺', '秘密揭露', '表面化', '缺乏洞察', '資訊不完整'],
+                shortMeaningUpright: '傾聽你的內在聲音和直覺，答案可能尚未完全顯現',
+                shortMeaningReversed: '可能忽略了重要的直覺訊息，或某些隱藏的事物將浮現'
+            },
+            {
+                id: 'major-3',
+                nameZh: '皇后',
+                nameEn: 'The Empress',
+                uprightKeywords: ['豐盛', '養育', '創造力', '自然', '感官享受'],
+                reversedKeywords: ['匱乏', '過度依賴', '創意枯竭', '忽視自我', '物質執著'],
+                shortMeaningUpright: '象徵豐盛和創造力的時期，適合培育新的想法或關係',
+                shortMeaningReversed: '可能感到創造力受阻，或需要更好地照顧自己'
+            },
+            {
+                id: 'major-4',
+                nameZh: '皇帝',
+                nameEn: 'The Emperor',
+                uprightKeywords: ['權威', '結構', '掌控', '穩定', '領導力'],
+                reversedKeywords: ['專制', '僵化', '失控', '濫用權力', '缺乏紀律'],
+                shortMeaningUpright: '需要建立秩序和結構，運用你的領導能力來達成目標',
+                shortMeaningReversed: '可能面對過度控制的情況，或需要重新建立健康的界限'
+            },
+            {
+                id: 'major-5',
+                nameZh: '教皇',
+                nameEn: 'The Hierophant',
+                uprightKeywords: ['傳統', '教導', '信仰', '體系', '指引'],
+                reversedKeywords: ['叛逆', '打破傳統', '獨立思考', '僵化體制', '質疑'],
+                shortMeaningUpright: '尋求傳統智慧或導師的指引，遵循既有的價值體系',
+                shortMeaningReversed: '可能需要挑戰傳統或尋找自己的道路，不盲從權威'
+            },
+            {
+                id: 'major-6',
+                nameZh: '戀人',
+                nameEn: 'The Lovers',
+                uprightKeywords: ['愛情', '選擇', '和諧', '價值觀', '連結'],
+                reversedKeywords: ['失衡', '價值衝突', '錯誤選擇', '關係問題', '不一致'],
+                shortMeaningUpright: '面臨重要的選擇，需要與你的價值觀和內心保持一致',
+                shortMeaningReversed: '可能存在價值觀的衝突，或關係中出現不和諧'
+            },
+            {
+                id: 'major-7',
+                nameZh: '戰車',
+                nameEn: 'The Chariot',
+                uprightKeywords: ['意志力', '勝利', '決心', '前進', '掌控'],
+                reversedKeywords: ['失去方向', '缺乏控制', '侵略性', '失敗', '阻礙'],
+                shortMeaningUpright: '憑藉堅定的意志和決心，你可以克服障礙達成目標',
+                shortMeaningReversed: '可能失去方向或動力，需要重新評估你的目標和方法'
+            },
+            {
+                id: 'major-8',
+                nameZh: '力量',
+                nameEn: 'Strength',
+                uprightKeywords: ['勇氣', '耐心', '溫柔', '內在力量', '自我控制'],
+                reversedKeywords: ['軟弱', '懷疑', '缺乏自信', '濫用力量', '失控'],
+                shortMeaningUpright: '以溫柔和耐心來展現真正的力量，相信你的內在能量',
+                shortMeaningReversed: '可能缺乏自信或過度壓抑，需要找回內在的平衡'
+            },
+            {
+                id: 'major-9',
+                nameZh: '隱者',
+                nameEn: 'The Hermit',
+                uprightKeywords: ['內省', '獨處', '尋求真理', '智慧', '指引'],
+                reversedKeywords: ['孤立', '孤獨', '逃避', '拒絕幫助', '迷失'],
+                shortMeaningUpright: '需要獨處和反思的時刻，向內尋求答案和智慧',
+                shortMeaningReversed: '可能過度孤立自己，或需要走出內在世界與他人連結'
+            },
+            {
+                id: 'major-10',
+                nameZh: '命運之輪',
+                nameEn: 'Wheel of Fortune',
+                uprightKeywords: ['轉變', '機遇', '命運', '循環', '轉折點'],
+                reversedKeywords: ['厄運', '抗拒改變', '停滯', '失控', '壞運氣'],
+                shortMeaningUpright: '生命正在經歷重要的轉變，順應變化將帶來新機會',
+                shortMeaningReversed: '可能抗拒必要的改變，或正經歷具有挑戰性的時期'
+            },
+            {
+                id: 'major-11',
+                nameZh: '正義',
+                nameEn: 'Justice',
+                uprightKeywords: ['公平', '真相', '責任', '因果', '平衡'],
+                reversedKeywords: ['不公', '偏見', '逃避責任', '失衡', '不誠實'],
+                shortMeaningUpright: '需要公正地評估情況，為自己的行為負責並尋求平衡',
+                shortMeaningReversed: '可能面對不公平的情況，或需要更誠實地面對真相'
+            },
+            {
+                id: 'major-12',
+                nameZh: '吊人',
+                nameEn: 'The Hanged Man',
+                uprightKeywords: ['放手', '新視角', '暫停', '犧牲', '頓悟'],
+                reversedKeywords: ['拖延', '抗拒', '徒勞犧牲', '錯失時機', '僵局'],
+                shortMeaningUpright: '需要暫停並從不同角度看待事物，放下執著會帶來新理解',
+                shortMeaningReversed: '可能陷入拖延或無益的等待，需要採取行動改變現狀'
+            },
+            {
+                id: 'major-13',
+                nameZh: '死神',
+                nameEn: 'Death',
+                uprightKeywords: ['結束', '轉化', '釋放', '重生', '過渡'],
+                reversedKeywords: ['抗拒結束', '停滯', '無法放手', '恐懼改變', '腐敗'],
+                shortMeaningUpright: '某個階段正在結束，為新的開始創造空間，擁抱轉變',
+                shortMeaningReversed: '可能抗拒必要的結束，或害怕改變導致停滯不前'
+            },
+            {
+                id: 'major-14',
+                nameZh: '節制',
+                nameEn: 'Temperance',
+                uprightKeywords: ['平衡', '調和', '耐心', '中庸', '療癒'],
+                reversedKeywords: ['不平衡', '過度', '不耐煩', '缺乏和諧', '極端'],
+                shortMeaningUpright: '尋求平衡和調和，以耐心和節制來處理當前的情況',
+                shortMeaningReversed: '可能失去平衡或過於極端，需要找回中庸之道'
+            },
+            {
+                id: 'major-15',
+                nameZh: '惡魔',
+                nameEn: 'The Devil',
+                uprightKeywords: ['束縛', '執著', '誘惑', '物質', '陰影'],
+                reversedKeywords: ['解放', '覺醒', '打破枷鎖', '放下執著', '自由'],
+                shortMeaningUpright: '可能被某些執著或習慣束縛，需要意識到這些限制',
+                shortMeaningReversed: '正在擺脫束縛或不良模式，走向更大的自由'
+            },
+            {
+                id: 'major-16',
+                nameZh: '塔',
+                nameEn: 'The Tower',
+                uprightKeywords: ['突變', '破壞', '頓悟', '解構', '危機'],
+                reversedKeywords: ['逃避災難', '恐懼改變', '延遲崩塌', '內在動盪', '微小震動'],
+                shortMeaningUpright: '突如其來的改變會打破舊有結構，但這是必要的轉變',
+                shortMeaningReversed: '可能正在避免必要的改變，或內在經歷著隱藏的動盪'
+            },
+            {
+                id: 'major-17',
+                nameZh: '星星',
+                nameEn: 'The Star',
+                uprightKeywords: ['希望', '啟發', '寧靜', '療癒', '信念'],
+                reversedKeywords: ['失望', '絕望', '缺乏信心', '失去方向', '斷聯'],
+                shortMeaningUpright: '保持希望和信念，你正走在正確的道路上，療癒正在發生',
+                shortMeaningReversed: '可能感到失望或失去信心，需要重新與希望連結'
+            },
+            {
+                id: 'major-18',
+                nameZh: '月亮',
+                nameEn: 'The Moon',
+                uprightKeywords: ['幻象', '潛意識', '不確定', '直覺', '夢境'],
+                reversedKeywords: ['揭露真相', '釋放恐懼', '清晰', '擺脫幻覺', '理解'],
+                shortMeaningUpright: '事物可能不如表面所見，信任你的直覺並小心幻象',
+                shortMeaningReversed: '迷霧開始散去，真相逐漸清晰，恐懼正在消退'
+            },
+            {
+                id: 'major-19',
+                nameZh: '太陽',
+                nameEn: 'The Sun',
+                uprightKeywords: ['喜悅', '成功', '活力', '光明', '慶祝'],
+                reversedKeywords: ['過度樂觀', '延遲快樂', '陰霾', '缺乏熱情', '失望'],
+                shortMeaningUpright: '充滿喜悅和成功的時期，盡情享受生命的美好',
+                shortMeaningReversed: '可能暫時感到低落，但陽光仍會再次照耀'
+            },
+            {
+                id: 'major-20',
+                nameZh: '審判',
+                nameEn: 'Judgement',
+                uprightKeywords: ['覺醒', '更新', '反省', '呼喚', '釋放'],
+                reversedKeywords: ['自我懷疑', '逃避責任', '無法放下', '內疚', '缺乏覺察'],
+                shortMeaningUpright: '是時候反省過去並做出新的決定，接受生命的呼喚',
+                shortMeaningReversed: '可能陷入自我批判，或難以放下過去並向前邁進'
+            },
+            {
+                id: 'major-21',
+                nameZh: '世界',
+                nameEn: 'The World',
+                uprightKeywords: ['完成', '成就', '圓滿', '整合', '旅程結束'],
+                reversedKeywords: ['未完成', '缺乏閉環', '延遲', '目標未達', '執著'],
+                shortMeaningUpright: '一個循環的圓滿完成，慶祝你的成就並準備新的開始',
+                shortMeaningReversed: '可能還有未完成的事項，或需要更多努力來達成目標'
+            }
+        ];
+
+        const SPREADS = {
+            one: {
+                id: 'one',
+                name: '單張：今日提醒',
+                positions: [
+                    { index: 0, name: '今日提醒', description: '此刻最需要留意的方向' }
+                ]
+            },
+            three: {
+                id: 'three',
+                name: '三張：情境/障礙/建議',
+                positions: [
+                    { index: 0, name: '情境', description: '現況氛圍/你身處的狀態' },
+                    { index: 1, name: '障礙', description: '卡點/盲點/需要調整之處' },
+                    { index: 2, name: '建議', description: '下一步可採取的行動與態度' }
+                ]
+            }
+        };
+
+        const TOPIC_LENS = {
+            love: {
+                label: '感情',
+                prefix: '在感情面向上，',
+                summaryTemplate: '關於{themeKeywords}，可以考慮{advice}'
+            },
+            career: {
+                label: '工作',
+                prefix: '在工作面向上，',
+                summaryTemplate: '針對{themeKeywords}，你可以嘗試{advice}'
+            },
+            money: {
+                label: '財務',
+                prefix: '在財務面向上，',
+                summaryTemplate: '關於{themeKeywords}，建議你{advice}'
+            },
+            self: {
+                label: '自我',
+                prefix: '在自我探索上，',
+                summaryTemplate: '關於{themeKeywords}，你可以{advice}'
+            }
+        };
+
+        const REVERSED_RATE = 0.5;
+
+        // ========================================
+        // UTILS SECTION
+        // ========================================
+
+        function randomInt(max) {
+            if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+                const array = new Uint32Array(1);
+                crypto.getRandomValues(array);
+                return array[0] % max;
+            }
+            return Math.floor(Math.random() * max);
+        }
+
+        function shuffle(array) {
+            const result = [...array];
+            for (let i = result.length - 1; i > 0; i--) {
+                const j = randomInt(i + 1);
+                [result[i], result[j]] = [result[j], result[i]];
+            }
+            return result;
+        }
+
+        function pickUnique(cards, count) {
+            const shuffled = shuffle(cards);
+            return shuffled.slice(0, count);
+        }
+
+        function getOrientation() {
+            return Math.random() < REVERSED_RATE ? 'reversed' : 'upright';
+        }
+
+        function pickRandomFromArray(arr, count = 1) {
+            const shuffled = shuffle(arr);
+            return count === 1 ? shuffled[0] : shuffled.slice(0, count);
+        }
+
+        // ========================================
+        // DOMAIN SECTION
+        // ========================================
+
+        function interpretCard(card, orientation, position, topic) {
+            const isUpright = orientation === 'upright';
+            const meaning = isUpright ? card.shortMeaningUpright : card.shortMeaningReversed;
+            const keywords = isUpright ? card.uprightKeywords : card.reversedKeywords;
+            const selectedKeywords = pickRandomFromArray(keywords, 2);
+
+            let description = '';
+            
+            if (position.name === '情境') {
+                description = `${meaning}。目前的狀態呈現出${selectedKeywords[0]}和${selectedKeywords[1]}的特質。`;
+            } else if (position.name === '障礙') {
+                description = `${meaning}。這裡點出了${selectedKeywords[0]}的拉扯，以及${selectedKeywords[1]}需要被調整。`;
+            } else if (position.name === '建議') {
+                description = `${meaning}。可以考慮從${selectedKeywords[0]}的角度出發，並且注意${selectedKeywords[1]}。`;
+            } else {
+                description = `${meaning}。今天特別留意${selectedKeywords[0]}與${selectedKeywords[1]}。`;
+            }
+
+            return {
+                card,
+                orientation,
+                position,
+                description,
+                keywords: selectedKeywords
+            };
+        }
+
+        function summarize(interpretations, topic, question) {
+            const topicInfo = TOPIC_LENS[topic];
+            
+            // Collect all keywords
+            const allKeywords = [];
+            interpretations.forEach(interp => {
+                allKeywords.push(...interp.keywords);
+            });
+
+            // Get advice from the last card (or only card)
+            const lastInterp = interpretations[interpretations.length - 1];
+            const adviceKeywords = lastInterp.keywords;
+
+            // Build summary
+            let summary = topicInfo.prefix;
+            
+            if (interpretations.length === 1) {
+                summary += `此刻的重點在於「${adviceKeywords[0]}」。你可以留意${adviceKeywords[1]}的面向，並保持開放的態度來面對當下的情況。`;
+            } else {
+                const themeKeywords = pickRandomFromArray(allKeywords, Math.min(3, allKeywords.length));
+                summary += `綜合來看，${themeKeywords.join('、')}是這次解讀的核心主題。`;
+                summary += `建議你從「${adviceKeywords[0]}」的方向思考，並且用${adviceKeywords[1]}的態度來面對挑戰。`;
+                summary += `記住，塔羅提供的是一種可能的視角，真正的選擇權仍在你手中。`;
+            }
+
+            return summary;
+        }
+
+        function performReading(question, topic, spreadType) {
+            const spread = SPREADS[spreadType];
+            const cardCount = spread.positions.length;
+            
+            // Pick unique cards
+            const selectedCards = pickUnique(CARDS, cardCount);
+            
+            // Create interpretations
+            const interpretations = selectedCards.map((card, index) => {
+                const orientation = getOrientation();
+                const position = spread.positions[index];
+                return interpretCard(card, orientation, position, topic);
+            });
+
+            // Generate summary
+            const summary = summarize(interpretations, topic, question);
+
+            return {
+                question,
+                topic,
+                spread,
+                interpretations,
+                summary
+            };
+        }
+
+        // ========================================
+        // UI SECTION
+        // ========================================
+
+        let currentReading = null;
+
+        function renderReading(reading) {
+            const resultSection = document.getElementById('resultSection');
+            const resultMeta = document.getElementById('resultMeta');
+            const cardsContainer = document.getElementById('cardsContainer');
+            const summarySection = document.getElementById('summarySection');
+
+            // Show result section
+            resultSection.classList.add('active');
+
+            // Render meta information
+            const topicLabel = TOPIC_LENS[reading.topic].label;
+            const spreadLabel = reading.spread.name;
+            
+            let metaHTML = `
+                <h3>抽牌結果</h3>
+                <p><strong>主題：</strong>${topicLabel}</p>
+                <p><strong>牌陣：</strong>${spreadLabel}</p>
+            `;
+
+            if (reading.question.trim()) {
+                metaHTML += `<p><strong>問題：</strong>${reading.question}</p>`;
+            } else {
+                metaHTML += `
+                    <div class="question-hint">
+                        💡 你可以思考更具體的問題，例如：「接下來一個月我在${topicLabel}上需要注意什麼？」
+                    </div>
+                `;
+            }
+
+            resultMeta.innerHTML = metaHTML;
+
+            // Render cards
+            cardsContainer.innerHTML = reading.interpretations.map(interp => {
+                const orientationText = interp.orientation === 'upright' ? '正位' : '逆位';
+                const orientationClass = interp.orientation === 'upright' ? '' : 'reversed';
+                
+                return `
+                    <div class="card-item">
+                        <div class="card-position">${interp.position.name}</div>
+                        <div class="card-name">${interp.card.nameZh}</div>
+                        <div class="card-orientation ${orientationClass}">${orientationText}</div>
+                        <div class="card-description">${interp.description}</div>
+                    </div>
+                `;
+            }).join('');
+
+            // Render summary
+            summarySection.innerHTML = `
+                <h3>整體解讀</h3>
+                <p>${reading.summary}</p>
+            `;
+
+            // Scroll to result
+            resultSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function handleDraw() {
+            const question = document.getElementById('question').value;
+            const topic = document.getElementById('topic').value;
+            const spread = document.getElementById('spread').value;
+
+            currentReading = performReading(question, topic, spread);
+            renderReading(currentReading);
+        }
+
+        function handleReset() {
+            // Clear form
+            document.getElementById('question').value = '';
+            document.getElementById('topic').value = 'love';
+            document.getElementById('spread').value = 'one';
+
+            // Hide result
+            document.getElementById('resultSection').classList.remove('active');
+
+            // Clear current reading
+            currentReading = null;
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Initialize event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('drawBtn').addEventListener('click', handleDraw);
+            document.getElementById('resetBtn').addEventListener('click', handleReset);
+        });
+    </script>
+</body>
+</html>
