@@ -507,23 +507,19 @@
         const TOPIC_LENS = {
             love: {
                 label: '感情',
-                prefix: '在感情面向上，',
-                summaryTemplate: '關於{themeKeywords}，可以考慮{advice}'
+                prefix: '在感情面向上，'
             },
             career: {
                 label: '工作',
-                prefix: '在工作面向上，',
-                summaryTemplate: '針對{themeKeywords}，你可以嘗試{advice}'
+                prefix: '在工作面向上，'
             },
             money: {
                 label: '財務',
-                prefix: '在財務面向上，',
-                summaryTemplate: '關於{themeKeywords}，建議你{advice}'
+                prefix: '在財務面向上，'
             },
             self: {
                 label: '自我',
-                prefix: '在自我探索上，',
-                summaryTemplate: '關於{themeKeywords}，你可以{advice}'
+                prefix: '在自我探索上，'
             }
         };
 
@@ -569,7 +565,7 @@
         // DOMAIN SECTION
         // ========================================
 
-        function interpretCard(card, orientation, position, topic) {
+        function interpretCard(card, orientation, position) {
             const isUpright = orientation === 'upright';
             const meaning = isUpright ? card.shortMeaningUpright : card.shortMeaningReversed;
             const keywords = isUpright ? card.uprightKeywords : card.reversedKeywords;
@@ -596,7 +592,7 @@
             };
         }
 
-        function summarize(interpretations, topic, question) {
+        function summarize(interpretations, topic) {
             const topicInfo = TOPIC_LENS[topic];
             
             // Collect all keywords
@@ -635,11 +631,11 @@
             const interpretations = selectedCards.map((card, index) => {
                 const orientation = getOrientation();
                 const position = spread.positions[index];
-                return interpretCard(card, orientation, position, topic);
+                return interpretCard(card, orientation, position);
             });
 
             // Generate summary
-            const summary = summarize(interpretations, topic, question);
+            const summary = summarize(interpretations, topic);
 
             return {
                 question,
